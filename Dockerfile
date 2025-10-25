@@ -16,6 +16,10 @@ RUN pnpm install --frozen-lockfile
 # Copy project files
 COPY . .
 
+# Accept build arguments for public env vars
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=$PUBLIC_API_URL
+
 # Build the application
 RUN pnpm run build
 
