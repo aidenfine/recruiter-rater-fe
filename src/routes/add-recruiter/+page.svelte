@@ -5,6 +5,8 @@
 	import { z } from 'zod';
 	import { env } from '$env/dynamic/public';
 	import { extractLinkedinUsername } from '$lib/utils/extractLinkedinUsername';
+	import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
+	import Check from '@lucide/svelte/icons/check';
 
 	const formSchema = z.object({
 		firstName: z.string().min(1, 'First name is required').min(2, 'Required Field').max(50),
@@ -13,6 +15,8 @@
 		linkedin: z.string().min(1, 'LinkedIn is required').max(50),
 		currentCompany: z.string().max(50, 'Must be 50 characters or less').optional()
 	});
+
+	let promptRecruiterReviewSuccess = $state(true);
 
 	let firstName = '';
 	let lastName = '';
@@ -75,14 +79,13 @@
 
 			const data = await response.json();
 			console.log('Success:', data);
+			promptRecruiterReviewSuccess = true;
 
 			firstName = '';
 			lastName = '';
 			jobTitle = '';
 			linkedin = '';
 			currentCompany = '';
-
-			alert('Recruiter added successfully!'); //TODO: change later to snackbar or something
 		} catch (error) {
 			console.error('Error submitting form:', error);
 			errors.form = error instanceof Error ? error.message : 'An error occurred';
@@ -92,10 +95,11 @@
 	};
 </script>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <form on:submit|preventDefault={handleSubmit} class="container mx-auto mt-20 max-w-md">
 	<div class="space-y-6">
 		{#if errors.form}
-			<div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+			<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
 				{errors.form}
 			</div>
 		{/if}
@@ -111,9 +115,9 @@
 				disabled={isSubmitting}
 			/>
 			{#if errors.linkedin}
-				<p class="text-red-500 text-sm">{errors.linkedin}</p>
+				<p class="text-sm text-red-500">{errors.linkedin}</p>
 			{:else}
-				<p class="text-muted-foreground text-sm">LinkedIn URL or username</p>
+				<p class="text-sm text-muted-foreground">LinkedIn URL or username</p>
 			{/if}
 		</div>
 
@@ -128,7 +132,7 @@
 				disabled={isSubmitting}
 			/>
 			{#if errors.firstName}
-				<p class="text-red-500 text-sm">{errors.firstName}</p>
+				<p class="text-sm text-red-500">{errors.firstName}</p>
 			{/if}
 		</div>
 
@@ -143,7 +147,7 @@
 				disabled={isSubmitting}
 			/>
 			{#if errors.lastName}
-				<p class="text-red-500 text-sm">{errors.lastName}</p>
+				<p class="text-sm text-red-500">{errors.lastName}</p>
 			{/if}
 		</div>
 
@@ -158,7 +162,7 @@
 				disabled={isSubmitting}
 			/>
 			{#if errors.jobTitle}
-				<p class="text-red-500 text-sm">{errors.jobTitle}</p>
+				<p class="text-sm text-red-500">{errors.jobTitle}</p>
 			{/if}
 		</div>
 
@@ -173,11 +177,25 @@
 				disabled={isSubmitting}
 			/>
 			{#if errors.currentCompany}
-				<p class="text-red-500 text-sm">{errors.currentCompany}</p>
+				<p class="text-sm text-red-500">{errors.currentCompany}</p>
 			{/if}
 		</div>
 
-		<Button type="submit" class="w-full" disabled={isSubmitting}>
+		{#if promptRecruiterReviewSuccess}
+			<div>
+				<Alert class="border-green-400">
+					<Check color="#00c951" />
+					<AlertTitle class="text-green-500">Success</AlertTitle>
+					<AlertDescription>After review recruiter will be visible to review</AlertDescription>
+				</Alert>
+			</div>
+		{/if}
+		<Button
+			type="submit"
+			class="w-full"
+			disabled={isSubmitting}
+			aria-disabled={promptRecruiterReviewSuccess}
+		>
 			{isSubmitting ? 'Submitting...' : 'Submit'}
 		</Button>
 	</div>
