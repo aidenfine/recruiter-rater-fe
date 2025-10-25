@@ -16,7 +16,7 @@
 		currentCompany: z.string().max(50, 'Must be 50 characters or less').optional()
 	});
 
-	let promptRecruiterReviewSuccess = $state(true);
+	let promptRecruiterReviewSuccess = $state(false);
 
 	let firstName = '';
 	let lastName = '';
