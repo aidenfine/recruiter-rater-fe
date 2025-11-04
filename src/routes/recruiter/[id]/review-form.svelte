@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { env } from '$env/dynamic/private';
+	import { env } from '$env/dynamic/public';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import Label from '$lib/components/ui/label/label.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import z from 'zod';
 
 	let { recruiterId } = $props();
@@ -62,3 +65,40 @@
 		}
 	};
 </script>
+
+<!-- svelte-ignore event_directive_deprecated -->
+<form on:submit|preventDefault={handleSubmit} class="container mx-auto mt-20 max-w-md">
+	<div class="space-y-6">
+		{#if errors.form}
+			<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+				{errors.form}
+			</div>
+		{/if}
+
+		<div class="space-y-2">
+			<Label for="rating" class="text-base font-medium">Rating</Label>
+			<Input
+				name="rating"
+				type="number"
+				bind:value={rating}
+				placeholder="0"
+				class="w-full {errors.rating ? 'border-red-500' : ''}"
+				disabled={isSubmitting}
+			/>
+		</div>
+		<div class="space-y-2">
+			<Label for="description" class="text-base font-medium">Description</Label>
+			<Input
+				name="description"
+				type="text"
+				bind:value={description}
+				placeholder="0"
+				class="w-full {errors.description ? 'border-red-500' : ''}"
+				disabled={isSubmitting}
+			/>
+		</div>
+		<Button type="submit" class="w-full" disabled={isSubmitting}>
+			{isSubmitting ? 'Submitting...' : 'Submit'}
+		</Button>
+	</div>
+</form>

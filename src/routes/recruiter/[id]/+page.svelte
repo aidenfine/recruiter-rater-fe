@@ -3,10 +3,11 @@
 	import type { PageData } from './types';
 	import Star from '@lucide/svelte/icons/star';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import ReviewForm from './review-form.svelte';
 
 	let { data }: { data: PageData } = $props();
 
-	let showReviewForm = $state(true);
+	let showReviewForm = $state(false);
 	let recruiter = data.recruiter;
 	let reviews = data.reviews;
 
@@ -100,6 +101,7 @@
 				<h2 class="mb-6 text-2xl font-bold text-gray-900">Review: {recruiter.name}</h2>
 			</div>
 			<Separator />
+			<ReviewForm recruiterId={recruiter.id} />
 		{/if}
 
 		<!-- Reviews Section -->
