@@ -65,7 +65,6 @@
 									/>
 								{/each}
 							</div>
-							<span class="text-xl font-semibold text-gray-900">{recruiter.rating}</span>
 						</div>
 						<span class="text-gray-500">({reviews.length} reviews)</span>
 					</div>
@@ -103,47 +102,45 @@
 		{/if}
 
 		<!-- Reviews Section -->
-		<div>
-			<h2 class="mb-6 text-2xl font-bold text-gray-900">Reviews</h2>
-
-			<div class="space-y-4">
-				{#if reviews.length == 0}
-					<p class="leading-7 not-first:mt-6">
-						Be the first to review {recruiter.name}!
-					</p>
-				{:else}
-					{#each reviews as review}
-						<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-							<!-- Review Header -->
-							<div class="mb-4 flex items-start justify-between">
-								<div>
-									<p class="mt-1 text-xs text-gray-500">
-										{new Date(review.createdAt).toLocaleDateString('en-US', {
-											year: 'numeric',
-											month: 'long',
-											day: 'numeric'
-										})}
-									</p>
-								</div>
-
-								<!-- Rating Stars -->
-								<div class="flex items-center gap-1">
-									{#each renderStars(review.rating) as filled}
-										<Star
-											size={16}
-											fill={filled ? '#fcc800' : '#d1d5dc'}
-											color={filled ? '#fcc800' : '#d1d5dc'}
-										/>
-									{/each}
-								</div>
+		<div class="space-y-4">
+			{#if reviews.length == 0}
+				<p class="leading-7 not-first:mt-6">
+					Be the first to review {recruiter.name}!
+				</p>
+			{:else}
+				{#each reviews as review}
+					<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+						<!-- Review Header -->
+						<div class="mb-4 flex items-start justify-between">
+							<div>
+								<p class="mt-1 text-xs text-gray-500">
+									{new Date(review.createdAt).toLocaleDateString('en-US', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric'
+									})}
+								</p>
 							</div>
 
-							<!-- Review Comment -->
-							<p class="leading-relaxed text-gray-700">{review.description}</p>
+							<!-- Rating Stars -->
+							<div class="flex items-center gap-1">
+								{#each renderStars(review.rating) as filled}
+									<Star
+										size={16}
+										fill={filled ? '#fcc800' : '#d1d5dc'}
+										color={filled ? '#fcc800' : '#d1d5dc'}
+									/>
+								{/each}
+							</div>
 						</div>
-					{/each}
-				{/if}
-			</div>
+
+						<!-- Review Comment -->
+						<p class="overflow-wrap-anywhere leading-relaxed wrap-break-word text-gray-700">
+							{review.description}
+						</p>
+					</div>
+				{/each}
+			{/if}
 		</div>
 	</div>
 </div>

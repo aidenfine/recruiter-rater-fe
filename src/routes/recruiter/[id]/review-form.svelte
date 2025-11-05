@@ -4,6 +4,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import z from 'zod';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
 	let { recruiterId } = $props();
 
@@ -117,12 +118,11 @@
 			</div>
 			<div class="space-y-2">
 				<Label for="description" class="text-base font-medium">Description</Label>
-				<Input
+				<Textarea
 					name="description"
-					type="text"
 					bind:value={description}
 					placeholder="Enter your review"
-					class="w-full {errors.description ? 'border-red-500' : ''}"
+					class="w-full {errors.description ? 'border-red-500' : ''} resize-none"
 					disabled={isSubmitting || reviewSubmitted}
 				/>
 			</div>
