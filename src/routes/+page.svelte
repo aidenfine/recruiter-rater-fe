@@ -30,7 +30,7 @@
 			<div class="rounded-lg border border-gray-200 bg-white p-6 transition-shadow hover:shadow-lg">
 				<div class="mb-4 flex items-start justify-between">
 					<div>
-						<p class="text-sm text-gray-600">uhhh temp company</p>
+						<p class="text-sm text-gray-600">{review.recruiterName ?? ''}</p>
 					</div>
 					<div class="flex items-center gap-1">
 						{#each Array(5) as _, i}

@@ -11,8 +11,6 @@
 	let recruiter = data.recruiter;
 	let reviews = data.reviews;
 
-	console.log(reviews, 'reviews');
-
 	function getInitials(firstName: string, lastName: string): string {
 		return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 	}
@@ -60,7 +58,7 @@
 					<div class="mt-4 flex items-center gap-4">
 						<div class="flex items-center gap-2">
 							<div class="flex">
-								{#each renderStars(Math.floor(0)) as filled}
+								{#each renderStars(Math.floor(recruiter.rating)) as filled}
 									<Star
 										fill={filled ? '#fcc800' : '#d1d5dc'}
 										color={filled ? '#fcc800' : '#d1d5dc'}
@@ -92,7 +90,7 @@
 			</div>
 			<div class="mt-4">
 				<Button class="cursor-pointer" onclick={() => (showReviewForm = true)}
-					>Leave a review</Button
+					>{`Review ${recruiter.name}`}</Button
 				>
 			</div>
 		</div>

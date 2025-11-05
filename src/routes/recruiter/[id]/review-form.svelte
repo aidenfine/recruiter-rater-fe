@@ -8,14 +8,16 @@
 	let { recruiterId } = $props();
 
 	const formSchema = z.object({
-		rating: z.number().max(5, 'cannot be larger than 5'),
+		rating: z.number().min(1, 'Please select a rating').max(5, 'cannot be larger than 5'),
 		description: z.string()
 	});
 
-	let rating = 5;
-	let description = '';
-	let errors: Record<string, string> = {};
-	let isSubmitting = false;
+	let rating = $state(0);
+	let description = $state('');
+	let errors = $state<Record<string, string>>({});
+	let isSubmitting = $state(false);
+	let hoveredStar = $state(0);
+	let reviewSubmitted = $state(false);
 
 	const handleSubmit = async () => {
 		errors = {};
@@ -30,10 +32,9 @@
 				if (err.path[0]) {
 					errors[err.path[0] as string] = err.message;
 				}
-				console.log('review validation failed', errors);
-				isSubmitting = false;
-				return;
 			});
+			isSubmitting = false;
+			return;
 		}
 		try {
 			const payload = {
@@ -45,7 +46,7 @@
 			const response = await fetch(`${env.PUBLIC_API_URL}api/v1/reviews`, {
 				method: 'POST',
 				headers: {
-					'Content-Tyoe': 'application/json'
+					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(payload)
 			});
@@ -55,8 +56,7 @@
 				throw new Error(errorData.message || 'Failed to add recruiter');
 			}
 
-			const data = await response.json();
-			console.log('data', data);
+			reviewSubmitted = true;
 		} catch (error) {
 			console.error('Error submitting form:', error);
 			errors.form = error instanceof Error ? error.message : 'An error occurred';
@@ -64,41 +64,71 @@
 			isSubmitting = false;
 		}
 	};
+
+	const setRating = (value: number) => {
+		rating = value;
+		errors.rating = '';
+	};
 </script>
 
-<!-- svelte-ignore event_directive_deprecated -->
-<form on:submit|preventDefault={handleSubmit} class="container mx-auto mt-20 max-w-md">
-	<div class="space-y-6">
-		{#if errors.form}
-			<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-				{errors.form}
-			</div>
-		{/if}
+<form onsubmit={handleSubmit} class="container mx-auto mt-20 max-w-md">
+	{#if reviewSubmitted}
+		Review has been submitted, to reduce spam your review is going through our review process.
+	{:else}
+		<div class="space-y-6">
+			{#if errors.form}
+				<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+					{errors.form}
+				</div>
+			{/if}
 
-		<div class="space-y-2">
-			<Label for="rating" class="text-base font-medium">Rating</Label>
-			<Input
-				name="rating"
-				type="number"
-				bind:value={rating}
-				placeholder="0"
-				class="w-full {errors.rating ? 'border-red-500' : ''}"
-				disabled={isSubmitting}
-			/>
+			<div class="space-y-2">
+				<Label for="rating" class="text-base font-medium">Rating</Label>
+				<div class="flex gap-2">
+					{#each [1, 2, 3, 4, 5] as star}
+						<button
+							type="button"
+							aria-label="star-btn"
+							onclick={() => setRating(star)}
+							onmouseenter={() => (hoveredStar = star)}
+							onmouseleave={() => (hoveredStar = 0)}
+							disabled={isSubmitting}
+							class="transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50"
+						>
+							<svg
+								class="h-8 w-8 {hoveredStar >= star || rating >= star
+									? 'fill-yellow-400 text-yellow-400'
+									: 'fill-none text-gray-300'} transition-colors"
+								stroke="currentColor"
+								stroke-width="2"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+								/>
+							</svg>
+						</button>
+					{/each}
+				</div>
+				{#if errors.rating}
+					<p class="text-sm text-red-500">{errors.rating}</p>
+				{/if}
+			</div>
+			<div class="space-y-2">
+				<Label for="description" class="text-base font-medium">Description</Label>
+				<Input
+					name="description"
+					type="text"
+					bind:value={description}
+					placeholder="Enter your review"
+					class="w-full {errors.description ? 'border-red-500' : ''}"
+					disabled={isSubmitting || reviewSubmitted}
+				/>
+			</div>
+			<Button type="submit" class="w-full" disabled={isSubmitting}>
+				{isSubmitting ? 'Submitting...' : 'Submit'}
+			</Button>
 		</div>
-		<div class="space-y-2">
-			<Label for="description" class="text-base font-medium">Description</Label>
-			<Input
-				name="description"
-				type="text"
-				bind:value={description}
-				placeholder="0"
-				class="w-full {errors.description ? 'border-red-500' : ''}"
-				disabled={isSubmitting}
-			/>
-		</div>
-		<Button type="submit" class="w-full" disabled={isSubmitting}>
-			{isSubmitting ? 'Submitting...' : 'Submit'}
-		</Button>
-	</div>
+	{/if}
 </form>

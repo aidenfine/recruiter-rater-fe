@@ -18,14 +18,14 @@
 
 	let promptRecruiterReviewSuccess = $state(false);
 
-	let firstName = '';
-	let lastName = '';
-	let jobTitle = '';
-	let linkedin = '';
-	let currentCompany = '';
+	let firstName = $state('');
+	let lastName = $state('');
+	let jobTitle = $state('');
+	let linkedin = $state('');
+	let currentCompany = $state('');
 
-	let errors: Record<string, string> = {};
-	let isSubmitting = false;
+	let errors = $state<Record<string, string>>({});
+	let isSubmitting = $state(false);
 
 	const handleSubmit = async () => {
 		errors = {};
@@ -45,7 +45,6 @@
 					errors[err.path[0] as string] = err.message;
 				}
 			});
-			console.log('Form validation failed:', errors);
 			isSubmitting = false;
 			return;
 		}
@@ -78,7 +77,6 @@
 			}
 
 			const data = await response.json();
-			console.log('Success:', data);
 			promptRecruiterReviewSuccess = true;
 
 			firstName = '';
@@ -95,8 +93,7 @@
 	};
 </script>
 
-<!-- svelte-ignore event_directive_deprecated -->
-<form on:submit|preventDefault={handleSubmit} class="container mx-auto mt-20 max-w-md">
+<form onsubmit={handleSubmit} class="container mx-auto mt-20 max-w-md">
 	<div class="space-y-6">
 		{#if errors.form}
 			<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">

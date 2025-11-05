@@ -20,6 +20,7 @@ export type Review = {
 	description: string;
 	thumbsDownCount: number;
 	thumbsUpCount: number;
+	recruiterName?: string;
 };
 
 export type PageData = {
