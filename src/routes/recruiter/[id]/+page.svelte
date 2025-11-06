@@ -8,8 +8,8 @@
 	let { data }: { data: PageData } = $props();
 
 	let showReviewForm = $state(false);
-	let recruiter = data.recruiter;
-	let reviews = data.reviews;
+	let recruiter = $derived(data.recruiter);
+	let reviews = $derived(data.reviews);
 
 	function getInitials(firstName: string, lastName: string): string {
 		return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -17,6 +17,10 @@
 
 	function renderStars(rating: number) {
 		return Array.from({ length: 5 }, (_, i) => i < rating);
+	}
+
+	function handleReviewSuccess() {
+		showReviewForm = false;
 	}
 </script>
 
@@ -98,7 +102,7 @@
 				<h2 class="mb-6 text-2xl font-bold text-gray-900">Review: {recruiter.name}</h2>
 			</div>
 			<Separator />
-			<ReviewForm recruiterId={recruiter.id} />
+			<ReviewForm recruiterId={recruiter.id} onSuccess={handleReviewSuccess} />
 		{/if}
 
 		<!-- Reviews Section -->

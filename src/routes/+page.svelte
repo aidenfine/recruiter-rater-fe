@@ -8,10 +8,10 @@
 
 <div class="container mx-auto mt-20 flex flex-col items-center gap-5">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-		Don't waste your time with shit recruiters.
+		Don't waste your time with bad recruiters.
 	</h1>
 	<h4 class="scroll-m-20 text-xl font-semibold tracking-tight">
-		Let's find someone that will actually support you.
+		Check out what other people say first.
 	</h4>
 
 	<a href="/search">

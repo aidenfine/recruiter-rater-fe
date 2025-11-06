@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import z from 'zod';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import { invalidateAll } from '$app/navigation';
 
-	let { recruiterId } = $props();
+	let { recruiterId, onSuccess } = $props();
 
 	const formSchema = z.object({
 		rating: z.number().min(1, 'Please select a rating').max(5, 'cannot be larger than 5'),
@@ -44,7 +44,7 @@
 				description: result.data?.description
 			};
 
-			const response = await fetch(`${env.PUBLIC_API_URL}api/v1/reviews`, {
+			const response = await fetch(`${env.PUBLIC_API_URL}api/v1/reviews?limit=200`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -58,6 +58,15 @@
 			}
 
 			reviewSubmitted = true;
+
+			await invalidateAll();
+
+			if (onSuccess) {
+				onSuccess();
+			}
+
+			rating = 0;
+			description = '';
 		} catch (error) {
 			console.error('Error submitting form:', error);
 			errors.form = error instanceof Error ? error.message : 'An error occurred';
@@ -73,62 +82,64 @@
 </script>
 
 <form onsubmit={handleSubmit} class="container mx-auto mt-20 max-w-md">
-	{#if reviewSubmitted}
-		Review has been submitted, to reduce spam your review is going through our review process.
-	{:else}
-		<div class="space-y-6">
-			{#if errors.form}
-				<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-					{errors.form}
-				</div>
-			{/if}
+	<div class="space-y-6">
+		{#if errors.form}
+			<div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+				{errors.form}
+			</div>
+		{/if}
 
-			<div class="space-y-2">
-				<Label for="rating" class="text-base font-medium">Rating</Label>
-				<div class="flex gap-2">
-					{#each [1, 2, 3, 4, 5] as star}
-						<button
-							type="button"
-							aria-label="star-btn"
-							onclick={() => setRating(star)}
-							onmouseenter={() => (hoveredStar = star)}
-							onmouseleave={() => (hoveredStar = 0)}
-							disabled={isSubmitting}
-							class="transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50"
+		{#if reviewSubmitted}
+			<div class="rounded border border-green-200 bg-green-50 px-4 py-3 text-green-800">
+				Review submitted successfully!
+			</div>
+		{/if}
+
+		<div class="space-y-2">
+			<Label for="rating" class="text-base font-medium">Rating</Label>
+			<div class="flex gap-2">
+				{#each [1, 2, 3, 4, 5] as star}
+					<button
+						type="button"
+						aria-label="star-btn"
+						onclick={() => setRating(star)}
+						onmouseenter={() => (hoveredStar = star)}
+						onmouseleave={() => (hoveredStar = 0)}
+						disabled={isSubmitting}
+						class="transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						<svg
+							class="h-8 w-8 {hoveredStar >= star || rating >= star
+								? 'fill-yellow-400 text-yellow-400'
+								: 'fill-none text-gray-300'} transition-colors"
+							stroke="currentColor"
+							stroke-width="2"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
 						>
-							<svg
-								class="h-8 w-8 {hoveredStar >= star || rating >= star
-									? 'fill-yellow-400 text-yellow-400'
-									: 'fill-none text-gray-300'} transition-colors"
-								stroke="currentColor"
-								stroke-width="2"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-								/>
-							</svg>
-						</button>
-					{/each}
-				</div>
-				{#if errors.rating}
-					<p class="text-sm text-red-500">{errors.rating}</p>
-				{/if}
+							<path
+								d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+							/>
+						</svg>
+					</button>
+				{/each}
 			</div>
-			<div class="space-y-2">
-				<Label for="description" class="text-base font-medium">Description</Label>
-				<Textarea
-					name="description"
-					bind:value={description}
-					placeholder="Enter your review"
-					class="w-full {errors.description ? 'border-red-500' : ''} resize-none"
-					disabled={isSubmitting || reviewSubmitted}
-				/>
-			</div>
-			<Button type="submit" class="w-full" disabled={isSubmitting}>
-				{isSubmitting ? 'Submitting...' : 'Submit'}
-			</Button>
+			{#if errors.rating}
+				<p class="text-sm text-red-500">{errors.rating}</p>
+			{/if}
 		</div>
-	{/if}
+		<div class="space-y-2">
+			<Label for="description" class="text-base font-medium">Description</Label>
+			<Textarea
+				name="description"
+				bind:value={description}
+				placeholder="Enter your review"
+				class="w-full {errors.description ? 'border-red-500' : ''} resize-none"
+				disabled={isSubmitting}
+			/>
+		</div>
+		<Button type="submit" class="w-full" disabled={isSubmitting}>
+			{isSubmitting ? 'Submitting...' : 'Submit'}
+		</Button>
+	</div>
 </form>
