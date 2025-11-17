@@ -12,7 +12,7 @@
 		firstName: z.string().min(1, 'First name is required').min(2, 'Required Field').max(50),
 		lastName: z.string().min(1, 'Last name is required').min(2, 'Required Field').max(50),
 		jobTitle: z.string().max(25, 'Must be 25 characters or less').optional(),
-		linkedin: z.string().min(1, 'LinkedIn is required').max(50),
+		linkedin: z.string().min(1, 'Link is too long.').max(200),
 		currentCompany: z.string().max(50, 'Must be 50 characters or less').optional()
 	});
 
